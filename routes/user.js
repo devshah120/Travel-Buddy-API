@@ -33,7 +33,7 @@ router.post("/register", async (req, res, next) => {
     if (user_exist) {
       return res.status(400).json({
         success: false,
-        msg: "User alredy exists",
+        msg: "User alredy exists. Please Login!!",
       });
     }
 
@@ -92,7 +92,7 @@ router.post("/login", async (req, res, next) => {
     let user = await User.findOne({ email: email });
 
     if (!user) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         msg: "User Not Exist go & register to continue.",
       });

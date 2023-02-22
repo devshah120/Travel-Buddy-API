@@ -22,6 +22,10 @@ connectDB();
 //
 app.use("/api/travel/auth", require("./routes/user"));
 
+//SHivam
+//Create cards
+app.use('/api/cards', require('./routes/cards'));
+
 const PORT = process.env.PORT || 3000;
 app.listen(
   PORT,

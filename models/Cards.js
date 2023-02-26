@@ -9,6 +9,14 @@ const CardsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    place: {
+        type: String,
+        required: true
+    },
+    price: {
+        type: String,
+        required: true
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

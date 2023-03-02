@@ -26,6 +26,10 @@ app.use("/api/travel/auth", require("./routes/user"));
 //Create cards
 app.use('/api/cards', require('./routes/cards'));
 
+app.use('/api/reservation', require('./routes/reservation'));
+
+app.use('/api/payment', require('./routes/payment'));
+
 const PORT = process.env.PORT || 3000;
 app.listen(
   PORT,

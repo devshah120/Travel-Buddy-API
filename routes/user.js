@@ -1,92 +1,140 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const bcryptjs = require("bcryptjs");
+const user_jwt = require("../middleware/user_jwt");
+const jwt = require("jsonwebtoken");
+const { token } = require("morgan");
 //const jsonwebtoken = require("jsonwebtoken");
 
-router.get("/", async (req, res) => {
-  //res.send('Get Req');
+router.get("/", user_jwt, async (req, res, next) => {
   try {
-    const datas = await User.find();
-    res.json(datas);
-  } catch (err) {
-    res.send("Error:" + err);
-  }
-});
-
-router.get("/:_id", async (req, res) => {
-  try {
-    const dataid = await User.findById(req.params._id);
-    res.json(dataid);
-  } catch (err) {
-    res.send("Error:" + err);
-  }
-});
-
-router.post("/register", async (req, res) => {
-  if (await userExists(req.body.email)) {
-    res.status(409).json({ error: "Email alreaday exists" });
-  } else {
-    const dataForm = new User({
-      fname: req.body.fname,
-      lname: req.body.lname,
-      email: req.body.email,
-      contactno: req.body.contactno,
-      password: req.body.password,
-      confpass: req.body.confpass,
+    const user = await User.findById(req.user.id)
+      .select("-password")
+      .select("-confpass");
+    res.status(200).json({
+      success: true,
+      user: user,
     });
-    try {
-      if (req.body.password == req.body.confpass) {
-        dataForm.save(dataForm).then((data) => {
-          res.status(200).json({
-            success: true,
-            user:dataForm
-          });
-        });
-      } else {
-        res.status(401).json({ error: "Password must be same" });
-      }
-    } catch (err) {
-      res.send("Error:" + err);
-    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+    next();
   }
 });
+router.post("/register", async (req, res, next) => {
+  const { fname, lname, contactno, email, password, confpass } = req.body;
 
-router.post('/login', (req, res) => {
-  User.findOne({ email: req.body.email, password: req.body.password }).then(datas => {
-      if (datas) {
+  try {
+    let user_exist = await User.findOne({ email: email });
+    if (user_exist) {
+      return res.status(400).json({
+        success: false,
+        msg: "User alredy exists. Please Login!!",
+      });
+    }
+
+    let user = new User();
+    user.fname = fname;
+    user.lname = lname;
+    user.contactno = contactno;
+    user.email = email;
+
+    const salt = await bcryptjs.genSalt(10);
+    user.password = await bcryptjs.hash(password, salt);
+
+    const csalt = await bcryptjs.genSalt(10);
+    user.confpass = await bcryptjs.hash(confpass, csalt);
+
+    let size = 200;
+    user.avatar = "https://gravatar.com/avatar/?s=" + size + "&d=retro";
+
+    await user.save();
+
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+    jwt.sign(
+      payload,
+      process.env.jwtUserSecret,
+      {
+        expiresIn: 360000,
+      },
+      (err, token) => {
+        if (err) throw err;
         res.status(200).json({
           success: true,
-          //user:dataForm
+          token: token,
         });
-          //res.status(200).json(datas)
-
       }
-      else {
-          res.status(401).json({ error: 'Incorrect email or password' })
-      }
-  }).catch(err => {
-      res.status(500).json({ error: err.message })
-  })
-});
+    );
 
-router.delete("/:_id", (req, res) => {
-  User.findByIdAndRemove(req.params._id)
-    .then((res) => {
-      res.json({ msg: "User Deleted" });
-    })
-    .catch((err) => {
-      res.json(err);
+    res.status({
+      success: true,
+      msg: "User registered",
+      user: user,
     });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
-const userExists = async (email) => {
-  const datas = await User.findOne({ email: email });
+router.post("/login", async (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
 
-  if (datas) {
-    return true;
-  } else {
-    return false;
+  try {
+    let user = await User.findOne({ email: email });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        msg: "User Not Exist go & register to continue.",
+      });
+    }
+
+    const isMatch = await bcryptjs.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        msg: "Invalid Password",
+      });
+    }
+
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    jwt.sign(
+      payload,
+      process.env.jwtUserSecret,
+      {
+        expiresIn: 360000,
+      },
+      (err, token) => {
+        if (err) throw err;
+        res.status(200).json({
+          success: true,
+          msg: "User Logged In",
+          token: token,
+          user: user,
+        });
+      }
+    );
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      msg: "Server Error",
+    });
   }
-};
+});
 
 module.exports = router;

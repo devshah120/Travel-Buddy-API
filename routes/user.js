@@ -37,7 +37,10 @@ router.post("/register", async (req, res) => {
     try {
       if (req.body.password == req.body.confpass) {
         dataForm.save(dataForm).then((data) => {
-          res.send(data);
+          res.status(200).json({
+            success: true,
+            user:dataForm
+          });
         });
       } else {
         res.status(401).json({ error: "Password must be same" });
@@ -48,18 +51,22 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", (req, res) => {
-  User.findOne({ email: req.body.email, password: req.body.password })
-    .then((datas) => {
+router.post('/login', (req, res) => {
+  User.findOne({ email: req.body.email, password: req.body.password }).then(datas => {
       if (datas) {
-        res.status(200).json(datas);
-      } else {
-        res.status(401).json({ error: "Incorrect email or password" });
+        res.status(200).json({
+          success: true,
+          //user:dataForm
+        });
+          //res.status(200).json(datas)
+
       }
-    })
-    .catch((err) => {
-      res.status(500).json({ error: err.message });
-    });
+      else {
+          res.status(401).json({ error: 'Incorrect email or password' })
+      }
+  }).catch(err => {
+      res.status(500).json({ error: err.message })
+  })
 });
 
 router.delete("/:_id", (req, res) => {

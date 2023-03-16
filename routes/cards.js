@@ -9,7 +9,7 @@ const router = express.Router();
 // method POST
 router.post('/', async (req, res, next) => {
     try {
-       const Cards1 = await Cards.create({ title: req.body.title, description: req.body.description,place: req.body.place,price: req.body.price, user: req.user.id});
+       const Cards1 = await Cards.create({ title: req.body.title, description: req.body.description,place: req.body.place,price: req.body.price});
        if(!Cards1) {
             return res.status(400).json({
                 success: false,

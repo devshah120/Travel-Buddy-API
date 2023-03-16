@@ -1,5 +1,5 @@
 const express = require("express");
-const user_jwt = require("../middleware/user_jwt");
+// const user_jwt = require("../middleware/user_jwt");
 
 const Cards = require('../models/Cards');
 
@@ -7,7 +7,7 @@ const router = express.Router();
 
 //desc      Create new cards
 // method POST
-router.post('/', user_jwt, async (req, res, next) => {
+router.post('/', async (req, res, next) => {
     try {
        const Cards1 = await Cards.create({ title: req.body.title, description: req.body.description,place: req.body.place,price: req.body.price, user: req.user.id});
        if(!Cards1) {
@@ -31,9 +31,9 @@ router.post('/', user_jwt, async (req, res, next) => {
 //desc Fetch all cards
 //methods GET
 
-router.get('/', user_jwt, async(req, res, next) => {
+router.get('/', async(req, res, next) => {
     try {
-        const Cards2 = await Cards.find({user: req.user.id, finished: false});
+        const Cards2 = await Cards.find();
         if(!Cards2) {
             return res.status(400).json({ success: false, msg: 'Something error happend'});
         }
@@ -48,7 +48,7 @@ router.get('/', user_jwt, async(req, res, next) => {
 //desc Fetch all Finished cards
 //methods GET
 
-router.get('/finished', user_jwt, async(req, res, next) => {
+router.get('/finished', async(req, res, next) => {
     try {
         const Cards2 = await Cards.find({user: req.user.id, finished: true});
         if(!Cards2) {

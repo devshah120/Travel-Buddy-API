@@ -7,9 +7,9 @@ const jwt = require("jsonwebtoken");
 const { token } = require("morgan");
 //const jsonwebtoken = require("jsonwebtoken");
 
-router.get("/", user_jwt, async (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id)
+    const user = await User.find()
       .select("-password")
       .select("-confpass");
     res.status(200).json({
@@ -23,6 +23,17 @@ router.get("/", user_jwt, async (req, res, next) => {
       message: "Server Error",
     });
     next();
+  }
+});
+router.get('/:_id', async (req, res) => {
+  try {
+      const user = await User.findById(req.params._id);
+      res.status(200).json({
+        success: true,
+        user: user,
+  });
+}catch (err) {
+      res.send('Error:' + err);
   }
 });
 router.post("/register", async (req, res, next) => {

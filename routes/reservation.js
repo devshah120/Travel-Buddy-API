@@ -27,4 +27,21 @@ router.post('/', user_jwt, async (req, res, next) => {
     }
 });
 
+//desc Fetch all reservations
+//methods GET
+
+router.get('/', async(req, res, next) => {
+    try {
+        const Resrerve = await  Reservation.find();
+        if(!Resrerve) {
+            return res.status(400).json({ success: false, msg: 'Something error happend'});
+        }
+
+        res.status(200).json({ success: true, count:Resrerve.length, cards: Resrerve,
+            msg: 'Successfully Fetched.' })
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = router;

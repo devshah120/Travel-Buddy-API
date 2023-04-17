@@ -33,7 +33,7 @@ time:{
     type:String,
     require:true,
 },
-class:{
+classs:{
     type:String,
     require:true,
 }

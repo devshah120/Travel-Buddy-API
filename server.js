@@ -30,6 +30,12 @@ app.use('/api/reservation', require('./routes/reservation'));
 
 app.use('/api/payment', require('./routes/payment'));
 
+app.use('/api/flight', require('./routes/flight'));
+
+app.use('/api/train', require('./routes/train'));
+
+app.use('/api/bus', require('./routes/bus'));
+
 const PORT = process.env.PORT || 3000;
 app.listen(
   PORT,

@@ -21,6 +21,10 @@ user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
 },
+people: {
+  type: String,
+  required:true,
+},
 date: {
     type: String,
     require:true,

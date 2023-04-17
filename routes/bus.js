@@ -8,7 +8,7 @@ const router = express.Router();
 // method POST
 router.post('/', user_jwt, async (req, res, next) => {
     try {
-       const Bus1 = await Bus.create({ name: req.body.name, email: req.body.email, from: req.body.from, to: req.body.to,user: req.user.id,date:req.body.date,time:req.body.time,class:req.body.class});
+       const Bus1 = await Bus.create({ name: req.body.name, email: req.body.email, from: req.body.from, to: req.body.to,user: req.user.id,people:req.body.people,date:req.body.date,time:req.body.time,class:req.body.class});
        if(!Bus1) {
             return res.status(400).json({
                 success: false,

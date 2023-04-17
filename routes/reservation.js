@@ -9,7 +9,7 @@ const router = express.Router();
 // method POST
 router.post('/', user_jwt, async (req, res, next) => {
     try {
-       const Reservation1 = await Reservation.create({ fname: req.body.fname, lname: req.body.lname, email: req.body.email, contactno: req.body.contactno,user: req.user.id,checkIn:req.body.checkIn,checkOut:req.body.checkOut});
+       const Reservation1 = await Reservation.create({ place:req.body.place,fname: req.body.fname, lname: req.body.lname, email: req.body.email, contactno: req.body.contactno,user: req.user.id,checkIn:req.body.checkIn,checkOut:req.body.checkOut});
        if(!Reservation1) {
             return res.status(400).json({
                 success: false,

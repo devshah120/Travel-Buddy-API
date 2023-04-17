@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const reservationSchema = new mongoose.Schema({
+  place:{
+    type: String,
+    required:true,
+  },
   fname: {
     type: String,
     required: true,
